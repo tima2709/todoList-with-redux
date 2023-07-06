@@ -3,15 +3,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {addTodos, deleteTodo, editTodos, getTodos} from "./redux/action/todoAction";
 import EditIcon from "./components/icons/edit-icon";
 import DeletIcon from "./components/icons/delet-icon";
+import Modal from "./components/Modal/Modal";
 
 const App = () => {
     const dispatch = useDispatch()
     const todo = useSelector(state => state.todo.todo)
     const [user, setUser] = useState({})
     const [editTodo, setEditTodo] = useState({})
-    const todoId = useSelector(state => state.todo.todo.find(el => el.id === editTodo))
-
-    console.log(todo, 'todo')
 
     useEffect(() => {
         dispatch(getTodos())
@@ -20,15 +18,11 @@ const App = () => {
     const handleAdd = () => {
         dispatch(addTodos(user))
         setUser({text: ''})
+        setEditTodo('')
     }
 
     const handleDelete = (el) => {
         dispatch(deleteTodo(el.id))
-    }
-
-    const handleEdit = () => {
-        const value = {...todoId, text: user}
-        dispatch(editTodos(value))
     }
 
 
@@ -37,7 +31,7 @@ const App = () => {
             <div className={'input-btn'}>
                 <input
                     type="text"
-                    value={user.text || editTodo.text}
+                    value={user.text}
                     onChange={(e) => setUser({...user, text: e.target.value})}
                 />
                 <button onClick={() => handleAdd()}>Add</button>
@@ -47,11 +41,15 @@ const App = () => {
                     <div key={el.id} className={'todos'}>
                         <h2>{el.text}</h2>
                         <div className={'btn-icon'}>
-                            <button onClick={() => handleEdit(el.id)}><EditIcon/></button>
+                            <button onClick={() => setEditTodo(el.id)}><EditIcon/></button>
                             <button onClick={() => handleDelete(el)}><DeletIcon/></button>
                         </div>
                     </div>
                 )
+            }
+            {
+                editTodo &&
+                <Modal edit={editTodo} setEdit={setEditTodo}/>
             }
         </div>
     );
